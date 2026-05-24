@@ -24,7 +24,31 @@ from datetime import datetime
 
 # Initialize App
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///medical_tracker.db'
+
+
+
+
+
+# Grab the database URL from the environment, fallback to local SQLite
+db_url = os.getenv('DATABASE_URL', 'sqlite:///medical_tracker.db')
+
+# FIX FOR RENDER: SQLAlchemy 1.4+ requires 'postgresql://' but Render gives 'postgres://'
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+
+
+
+
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///medical_tracker.db'
+
+
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+
+
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 CORS(app)
 db.init_app(app)
