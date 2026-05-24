@@ -1,6 +1,15 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
+
+// In production, this pulls our Render URL. Locally, it defaults to our Flask port.
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5000'
+axios.defaults.baseURL = API_URL
+
+
+
+
+
 export const useHospitalStore = defineStore('hospitals', {
   state: () => ({
     hospitals: [],
