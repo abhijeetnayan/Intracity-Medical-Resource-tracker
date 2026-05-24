@@ -29,8 +29,17 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 CORS(app)
 db.init_app(app)
 
+# # Initialize Redis (For 30-min Token Expiry)
+# r = redis.Redis(host=os.getenv('REDIS_HOST', 'localhost'), port=6379, db=0, decode_responses=True)
+
 # Initialize Redis (For 30-min Token Expiry)
-r = redis.Redis(host=os.getenv('REDIS_HOST', 'localhost'), port=6379, db=0, decode_responses=True)
+redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+r = redis.Redis.from_url(redis_url, decode_responses=True)
+
+
+
+
+
 
 # Try to import geo_utils, fallback if it doesn't exist yet
 try:
@@ -249,12 +258,29 @@ def login():
     username = data.get('username')
     password = data.get('password')
     
-    # 1. Check Admin Hardcode
-    if username == 'admin' and password == '123':
+    # # 1. Check Admin Hardcode
+    # if username == 'admin' and password == '123':
+    #     return jsonify({'role': 'admin', 'token': 'admin-token-123'})
+
+
+
+    # 1. Secure Admin Check using Environment Variables
+    admin_user = os.getenv('ADMIN_USERNAME', 'admin')
+    admin_pass = os.getenv('ADMIN_PASSWORD', 'secure_fallback_123') 
+    
+    if username == admin_user and password == admin_pass:
         return jsonify({'role': 'admin', 'token': 'admin-token-123'})
+
+
+
+
+
+
         
     # 2. Check Hospital Database
     hospital = Hospital.query.filter_by(username=username, password=password).first()
+    # In a real app, we will use werkzeug.security to check a hashed password here.
+    # For this hackathon prototype, we check the direct stringfrom database.
     if hospital:
         if not hospital.is_verified:
             return jsonify({'error': 'Account pending admin verification.'}), 403
