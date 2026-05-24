@@ -53,6 +53,38 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 CORS(app)
 db.init_app(app)
 
+
+
+
+
+
+
+db.init_app(app) # You already have this line
+
+# --- THE BULLETPROOF DATABASE BUILDER ---
+db_initialized = False
+
+@app.before_request
+def initialize_database():
+    global db_initialized
+    if not db_initialized:
+        try:
+            db.create_all()
+            print("Production database tables created.")
+            
+            # Check if empty, then seed
+            if not Hospital.query.first():
+                print("Injecting seed data...")
+                seed_data()
+                
+            db_initialized = True
+        except Exception as e:
+            print(f"Database initialization failed: {e}")
+# ----------------------------------------
+
+
+
+
 # # Initialize Redis (For 30-min Token Expiry)
 # r = redis.Redis(host=os.getenv('REDIS_HOST', 'localhost'), port=6379, db=0, decode_responses=True)
 
@@ -505,19 +537,19 @@ def cancel_request():
 
 
 
-# Gunicorn will execute this the moment the server boots up
-with app.app_context():
-    db.create_all()
-    print("Database tables verified/created.")
+# # Gunicorn will execute this the moment the server boots up
+# with app.app_context():
+#     db.create_all()
+#     print("Database tables verified/created.")
     
-    # Check if the database is empty. If it is, inject the seed data.
-    if not Hospital.query.first():
-        print("Database is empty. Injecting seed data...")
-        seed_data()
-# ---------------------------------
+#     # Check if the database is empty. If it is, inject the seed data.
+#     if not Hospital.query.first():
+#         print("Database is empty. Injecting seed data...")
+#         seed_data()
+# # ---------------------------------
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
 
 
