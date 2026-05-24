@@ -191,7 +191,7 @@ def token_decision():
 def seed_data():
     with app.app_context():
         db.create_all()
-        # Only seed if the database is completely empty
+        # Only seed if the database is completely empty  hard coaded just for prototype will use password hashing in actual production
         if not Hospital.query.first():
             h1 = Hospital(username="paras", password="123", name="Paras HMRI", address="Raja Bazar", latitude=25.605, longitude=85.082, hosp_type="Private", is_verified=True)
             h2 = Hospital(username="pmch", password="123", name="Patna Medical College", address="Ashok Rajpath", latitude=25.618, longitude=85.1666, hosp_type="Government", is_verified=True)
