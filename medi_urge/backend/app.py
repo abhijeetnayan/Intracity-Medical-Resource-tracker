@@ -479,4 +479,4 @@ def cancel_request():
 
 if __name__ == '__main__':
     seed_data()
-    app.run(debug=True, port=5000)
+    app.run( port=5000)
