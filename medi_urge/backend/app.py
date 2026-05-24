@@ -501,19 +501,41 @@ def cancel_request():
 
 
 
+
+
+
+
+# Gunicorn will execute this the moment the server boots up
+with app.app_context():
+    db.create_all()
+    print("Database tables verified/created.")
+    
+    # Check if the database is empty. If it is, inject the seed data.
+    if not Hospital.query.first():
+        print("Database is empty. Injecting seed data...")
+        seed_data()
+# ---------------------------------
+
 if __name__ == '__main__':
-    #seed_data()
-    # app.run( port=5000)
+    app.run(debug=True)
 
 
-    @app.route('/api/admin/force-build-db', methods=['GET'])
-    def force_build_db():
-        try:
-            # This forces the app to create the tables and inject the hospital data
-            db.create_all()
-            seed_data()
-            return jsonify({'status': 'success', 'message': 'Production database built and seeded successfully!'}), 200
-        except Exception as e:
-            return jsonify({'status': 'error', 'message': str(e)}), 500
 
-    CORS(app)
+
+
+# if __name__ == '__main__':
+#     #seed_data()
+#     # app.run( port=5000)
+
+
+#     # @app.route('/api/admin/force-build-db', methods=['GET'])
+#     # def force_build_db():
+#     #     try:
+#     #         # This forces the app to create the tables and inject the hospital data
+#     #         db.create_all()
+#     #         seed_data()
+#     #         return jsonify({'status': 'success', 'message': 'Production database built and seeded successfully!'}), 200
+#     #     except Exception as e:
+#     #         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+#     CORS(app)
