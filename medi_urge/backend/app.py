@@ -502,7 +502,18 @@ def cancel_request():
 
 
 if __name__ == '__main__':
-    seed_data()
+    #seed_data()
     # app.run( port=5000)
+
+
+    @app.route('/api/admin/force-build-db', methods=['GET'])
+    def force_build_db():
+        try:
+            # This forces the app to create the tables and inject the hospital data
+            db.create_all()
+            seed_data()
+            return jsonify({'status': 'success', 'message': 'Production database built and seeded successfully!'}), 200
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': str(e)}), 500
 
     CORS(app)
