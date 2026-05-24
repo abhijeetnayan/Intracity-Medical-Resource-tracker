@@ -59,7 +59,7 @@ db.init_app(app)
 
 
 
-db.init_app(app) # You already have this line
+
 
 # --- THE BULLETPROOF DATABASE BUILDER ---
 db_initialized = False
